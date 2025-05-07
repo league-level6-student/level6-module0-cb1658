@@ -34,6 +34,8 @@ public class CheetahSearchApi {
                 .baseUrl(baseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
+        
+        WebClient.builder().baseUrl(baseUrl).defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).build();
     }
 
     public void testRequest() {
@@ -81,7 +83,7 @@ public class CheetahSearchApi {
         String response = stringMono.block();
 
         System.out.println(response);
-    }
+    } 
 
     public Result[] getBookByTopic(String topic) {
         Mono<Result[]> cheetahMono = webClient

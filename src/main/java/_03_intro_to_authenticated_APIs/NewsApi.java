@@ -62,9 +62,9 @@ public class NewsApi {
     public ApiExampleWrapper getNewsStoryByTopic(String topic) {
         Mono<ApiExampleWrapper> apiExampleWrapperMono = webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .queryParam("q", topic)
-                        .queryParam("sortBy", "popularity")
-                        .queryParam("apiKey", apiKey)
+                        .queryParam("q", topic) // Keywords or phrases to search for in the article title and body.
+                        .queryParam("sortBy", "relevancy") // The order to sort the articles in. Possible options: relevancy, popularity, publishedAt
+                        .queryParam("apiKey", apiKey) // API Key for authentication
                         .build())
                 .retrieve()
                 .bodyToMono(ApiExampleWrapper.class);
@@ -78,25 +78,33 @@ public class NewsApi {
         ApiExampleWrapper apiExampleWrapper = getNewsStoryByTopic(topic);
 
         //Get the first article
-        Article article = apiExampleWrapper.getArticles().get(0);
+        Article article;
+        
+        if(!apiExampleWrapper.getArticles().isEmpty()) {
+        	article = apiExampleWrapper.getArticles().get(0);
+        	
+        	String articleTitle = article.getTitle();
+
+            //Get the content of the article
+            String articleContent = article.getContent();
+
+            //Get the URL of the article
+            String articleUrl = article.getUrl();
+
+            //Create the message
+            String message =
+                    articleTitle + " -\n"
+                            + articleContent
+                            + "\nFull article: " + articleUrl;
+            
+            return message;
+        }
 
         //Get the title of the article
-        String articleTitle = article.getTitle();
-
-        //Get the content of the article
-        String articleContent = article.getContent();
-
-        //Get the URL of the article
-        String articleUrl = article.getUrl();
-
-        //Create the message
-        String message =
-                articleTitle + " -\n"
-                        + articleContent
-                        + "\nFull article: " + articleUrl;
+        
 
         //Send the message
-        return message;
+        return "No topics found with topic '" + topic+"'";
     }
 
     public void setWebClient(WebClient webClient) {

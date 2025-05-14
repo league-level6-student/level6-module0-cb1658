@@ -12,9 +12,16 @@ class PayrollTest {
     void itShouldCalculatePaycheck() {
         //given
 
+    	int a = 5;
+    	int b = 7;
+    	
         //when
+    	
+    	int bla = 35;
 
         //then
+    	
+    	assertEquals(bla, new Payroll().calculatePaycheck(a, b));
     }
 
     @Test

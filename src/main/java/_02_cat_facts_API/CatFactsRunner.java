@@ -17,11 +17,13 @@ public class CatFactsRunner {
         
         while(hs.size() < 91) {  // Most likely 91 fat cat facts in the whole entire universe.
 
-        	hs.add(catFactsApi.findCatFact());
+        	if(hs.add(catFactsApi.findCatFact())) {
+        		System.out.println(String.format("%.02f", hs.size()/91.0*100) + "%");
+        	}
         	
         	//System.out.println(hs.size());
         	
-        	System.out.println(String.format("%.02f", hs.size()/91.0*100) + "%");
+        	
 
         }
         

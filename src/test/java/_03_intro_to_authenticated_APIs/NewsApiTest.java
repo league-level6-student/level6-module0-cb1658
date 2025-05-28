@@ -11,9 +11,12 @@ import org.springframework.web.reactive.function.client.WebClient.RequestHeaders
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
 import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
 import org.springframework.web.util.UriBuilder;
+
+import _01_intro_to_APIs.data_transfer_objects.Result;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -26,19 +29,60 @@ import static org.mockito.Mockito.*;
 class NewsApiTest {
 
     NewsApi newsApi;
+    
+    @Mock
+    WebClient wcM;
+    
+    @Mock
+    WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
+
+    @Mock
+    WebClient.RequestHeadersSpec requestHeadersSpecMock;
+
+    @Mock
+    WebClient.ResponseSpec responseSpecMock;
+
+    @Mock
+    Mono<ApiExampleWrapper> aewMonoMock;
 
     @BeforeEach
     void setUp() {
-
+    	MockitoAnnotations.openMocks(this);
+    	
+    	newsApi = new NewsApi();
+    	newsApi.setWebClient(wcM);
     }
 
     @Test
     void itShouldGetNewsStoryByTopic() {
         //given
+    	
+    	String topic = "Carrots";
+    	
+    	ApiExampleWrapper expectedAEW = new ApiExampleWrapper();
+    	
+    	Article article = new Article();
+    	List<Article> expectedArticle = new ArrayList<>();
+    	expectedArticle.add(article);
+    	
+    	when(wcM.get()).thenReturn(requestHeadersUriSpecMock);
+    	when(requestHeadersUriSpecMock.uri((Function<UriBuilder, URI>) any())).thenReturn(requestHeadersSpecMock);
+    	when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+    	when(responseSpecMock.bodyToMono(ApiExampleWrapper.class)).thenReturn(aewMonoMock);
+    	
+    	when(aewMonoMock.block()).thenReturn(expectedAEW);
 
         //when
+        
+        ApiExampleWrapper realVal = newsApi.getNewsStoryByTopic(topic);
+        realVal.setArticles(expectedArticle);
+        List<Article> realArticle = realVal.getArticles();
 
         //then
+        
+        verify(wcM, times(1)).get();
+        assertEquals(expectedAEW, realVal);
+        assertEquals(expectedArticle, realArticle);
     }
 
     @Test

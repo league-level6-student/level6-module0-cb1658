@@ -44,6 +44,9 @@ class NewsApiTest {
 
     @Mock
     Mono<ApiExampleWrapper> aewMonoMock;
+    
+    @Mock
+    ApiExampleWrapper aew;
 
     @BeforeEach
     void setUp() {
@@ -87,11 +90,32 @@ class NewsApiTest {
 
     @Test
     void itShouldFindStory(){
-        //given
+    	String topic = "Banana";
+        String storyTitle = "Climate Crisis Threatens the Banana, the World's Most Popular Fruit";
+        String articleLink = "https://news.slashdot.org/story/25/05/12/1535204/climate-crisis-threatens-the-banana-the-worlds-most-popular-fruit";
 
+        Article result = new Article();
+        result.setTitle(storyTitle);
+        result.setUrl(articleLink);
+        ApiExampleWrapper aew_ = new ApiExampleWrapper();
+        ArrayList<Article> a = new ArrayList<>();
+        a.add(result); aew_.setArticles(a);
+
+        when(wcM.get()).thenReturn(requestHeadersUriSpecMock);
+    	when(requestHeadersUriSpecMock.uri((Function<UriBuilder, URI>) any())).thenReturn(requestHeadersSpecMock);
+    	when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+    	when(responseSpecMock.bodyToMono(ApiExampleWrapper.class)).thenReturn(aewMonoMock);
+    	when(aewMonoMock.block()).thenReturn(aew_);
+
+        String expectedArticle =
+                storyTitle + " -\n"
+                        + articleLink;
         //when
+        String actualArticle = newsApi.findStory(topic);
 
         //then
+        verify(wcM, times(1)).get();
+
     }
 
 
